@@ -1,0 +1,1195 @@
+FORMAT: 1A
+HOST: https://sbs.keylog.net/api/sbs-backend-1.0.0-SNAPSHOT/
+
+# SBS
+
+API projektu Smart Bike Station.
+
+# Group Companies
+
+Firmy, které mohou působit např. jako partneři nebo zapůjčitelé.
+
+## Company collection [/companies]
+
+### List all companies [GET]
++ Response 200 (application/json)
+
+        {
+            "9": {
+                "id": 9,
+                "name": "Město Brno",
+                "roles": [
+                    "PARTNER"
+                ]
+            },
+            "10": {
+                "id": 10,
+                "name": "Prázdná duše s.r.o.",
+                "roles": [
+                    "PARTNER",
+                    "BIKE_OWNER"
+                ]
+            }
+        }
+
+### List all company IDs [GET /companies/ids]
++ Response 200 (application/json)
+
+        {
+            "allIds": [9, 10]
+        }
+
+### Create new company [POST]
++ Request (application/json)
+
+        {
+            "name": "Město Hradec Králové",
+            "roles": [
+                "PARTNER"
+            ]
+        }
+
++ Response 201 (application/json)
+
+        {
+            "id": 20,
+            "name": "Město Hradec Králové",
+            "roles": [
+                "PARTNER"
+            ]
+        }
+
+## Company [/companies/{id}]
++ Parameters
+    + id: 10 (number) - id firmy
+
+### Retrieve company [GET]
++ Response 200 (application/json)
+
+        {
+            "id": 10,
+            "name": "Prázdná duše s.r.o.",
+            "roles": [
+                "BIKE_OWNER"
+            ]
+        }
+
+### Update company [PUT]
++ Request (application/json)
+
+        {
+            "id": 10,
+            "name": "Prázdná duše a.s.",
+            "roles": [
+                "PARTNER",
+                "BIKE_OWNER"
+            ]
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": 10,
+            "name": "Prázdná duše a.s.",
+            "roles": [
+                "PARTNER",
+                "BIKE_OWNER"
+            ]
+        }
+
+### Delete company [DELETE]
++ Response 204
+
+
+# Group Lock remote events
+
+Události vzniklé na fyzických zámcích.
+
+## Emergency event collection [/locks/emergency-events]
+
+Nouzové odemknutí zámku.
+
+### List all emergency events [GET /locks/emergency-events{?station_id,lock_id}]
++ Parameters
+    + `station_id` (optional, number) - ID stojanu, pro který nás zajímají události. Pokud není zadán, není na stojany aplikováno žádné omezení. Pokud je současně zadáno `lock_id`, je tento parametr ignorován.
+    + lock_id (optional, number) - ID zámku, pro který nás zajímají události. Pokud není zadán, není na zámky aplikováno žádné omezení.
+
++ Response 200 (application/json)
+
+        {
+            "15": {
+                "id": 15,
+                "stationId": 50,
+                "lockIdd": 1,
+                "date": "2017-09-27T10:15:17.364+02:00",
+                "lockedBy": 232
+            },
+            "18": {
+                "id": 18,
+                "stationId": 51,
+                "lockIdd": 0,
+                "date": "2017-09-27T11:12:25.284+02:00",
+                "lockedBy": 178
+            }
+        }
+
+### Create new emergency event [POST]
+
+Určeno pro vzdálené volání stojanem.
+
++ Request (application/json)
+
+        {
+            "stationId": 50,
+            "lockIdd": 1,
+            "date": "2017-09-27T10:15:17+02:00"
+        }
+
++ Response 204
+
+## Lock event collection [/locks/lock-events]
+
+Žádost o uzamknutí zámku.
+
+### List all lock events  [GET /locks/lock-events{?station_id,lock_id}]
++ Parameters
+    + `station_id` (optional, number) - ID stojanu, pro který nás zajímají události. Pokud není zadán, není na stojany aplikováno žádné omezení. Pokud je současně zadáno `lock_id`, je tento parametr ignorován.
+    + lock_id (optional, number) - ID zámku, pro který nás zajímají události. Pokud není zadán, není na zámky aplikováno žádné omezení.
+
++ Response 200 (application/json)
+
+        {
+            "15": {
+                "id": 15,
+                "stationId": 50,
+                "lockIdd": 1,
+                "date": "2017-09-27T10:21:10.998+02:00",
+                "userId": 225,
+                "authorized": true
+            },
+            "18": {
+                "id": 18,
+                "stationId": 51,
+                "lockIdd": 1,
+                "date": "2017-09-27T11:14:22.114+02:00",
+                "userId": 648,
+                "authorized": false
+            }
+        }
+
+### Create new lock event [POST]
+
+Určeno pro vzdálené volání stojanem. Vrací true pokud má být uzamknutí zámku povoleno, jinak false.
+
++ Request (application/json)
+
+        {
+            "stationId": 51,
+            "lockIdd": 0,
+            "cardId": "1549877751225487"
+        }
+
++ Response 200 (application/json)
+
+        true
+
+## Unlock event collection [/locks/unlock-events]
+
+Oznámení o standardním odemknutí zámku.
+
+### List all unlock events  [GET /locks/unlock-events{?station_id,lock_id}]
++ Parameters
+    + `station_id` (optional, number) - ID stojanu, pro který nás zajímají události. Pokud není zadán, není na stojany aplikováno žádné omezení. Pokud je současně zadáno `lock_id`, je tento parametr ignorován.
+    + lock_id (optional, number) - ID zámku, pro který nás zajímají události. Pokud není zadán, není na zámky aplikováno žádné omezení.
+
++ Response 200 (application/json)
+
+        {
+            "15": {
+                "id": 15,
+                "stationId": 50,
+                "lockIdd": 1,
+                "date": "2017-09-27T10:21:10.998+02:00",
+                "userId": 225
+            },
+            "18": {
+                "id": 18,
+                "stationId": 51,
+                "lockIdd": 1,
+                "date": "2017-09-27T11:14:22.114+02:00",
+                "userId": 648
+            }
+        }
+
+### Create new unlock event [POST]
+
+Určeno pro vzdálené volání stojanem.
+
++ Request (application/json)
+
+        {
+            "stationId": 51,
+            "lockIdd": 0,
+            "date": "2017-09-27T10:15:17+02:00",
+            "cardId": "1549877751225487"
+        }
+
++ Response 204
+
+## Remote lock event collection [/locks/events]
+
+Souhrnně všechny události vzniklé voláním ze stojanu.
+
+### List all remote lock events  [GET /locks/events{?station_id,lock_id}]
++ Parameters
+    + `station_id` (optional, number) - ID stojanu, pro který nás zajímají události. Pokud není zadán, není na stojany aplikováno žádné omezení. Pokud je současně zadáno `lock_id`, je tento parametr ignorován.
+    + lock_id (optional, number) - ID zámku, pro který nás zajímají události. Pokud není zadán, není na zámky aplikováno žádné omezení.
+
++ Response 200 (application/json)
+
+        {
+            "40": {
+                "id": 40,
+                "type": "UNLOCK",
+                "stationId": 50,
+                "lockIdd": 1,
+                "date": "2017-09-27T10:21:10.998+02:00",
+                "userId": 225
+            },
+            "38": {
+                "id": 38,
+                "type": "EMERGENCY",
+                "stationId": 50,
+                "lockIdd": 1,
+                "date": "2017-09-27T10:15:17.364+02:00",
+                "userId": 232
+            },
+            "35": {
+                "id": 35,
+                "type": "UNLOCK",
+                "stationId": 51,
+                "lockIdd": 1,
+                "date": "2017-09-27T11:14:22.114+02:00",
+                "userId": 648
+            },
+            "34": {
+                "id": 34,
+                "type": "EMERGENCY",
+                "stationId": 51,
+                "lockIdd": 0,
+                "date": "2017-09-27T11:12:25.284+02:00",
+                "userId": 178
+            }
+        }
+
+
+# Group Locks
+Zámky stojanů. Vytváření a úpravy zámků se provádí pouze v rámci stojanů, toto API slouží pouze pro výpis.
+
+## Lock collection [/locks]
+
+### List all locks [GET]
+Vrací všechny zámky všech stojanů.
+
++ Response 200 (application/json)
+
+        {
+            "60": {
+                "id": 60,
+                "idd": 0,
+                "stationId": 50,
+                "type": ["ZK", "ZE"],
+                "charging": true,
+                "lockedBy": null
+            },
+            "61": {
+                "id": 61,
+                "idd": 1,
+                "stationId": 50,
+                "type": ["ZK", "ZE"],
+                "charging": true,
+                "lockedBy": 143
+            },
+            "62": {
+                "id": 62,
+                "idd": 0,
+                "stationId": 51,
+                "type": ["S"],
+                "charging": false,
+                "lockedBy": 204
+            },
+            "63": {
+                "id": 63,
+                "idd": 1,
+                "stationId": 51,
+                "type": ["S"],
+                "charging": false,
+                "lockedBy": null
+            }
+        }
+
+### List all lock IDs [GET /locks/ids]
++ Response 200 (application/json)
+
+        {
+            "allIds": [60, 61, 62, 63]
+        }
+
+
+## Lock [/locks/{id}]
++ Parameters
+    + id: 62 (number) - ID zámku
+
+### Retrieve lock [GET]
++ Response 200 (application/json)
+
+        {
+            "id": 62,
+            "idd": 0,
+            "stationId": 51,
+            "type": ["S", "ZE"],
+            "charging": false,
+            "lockedBy": 204
+        }
+
+### Update lock [PUT]
++ Request (application/json)
+
+        {
+            "id": 62,
+            "type": ["S", "ZE"],
+            "charging": true
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": 62,
+            "idd": 0,
+            "stationId": 51,
+            "type": ["S"],
+            "charging": true,
+            "lockedBy": 204
+        }
+
+
+# Group Station configuration events
+
+## Events collection [/station/configuration/events]
+
+### List all events [GET /station/configuration/events{?station_id}]
++ Parameters
+    + station_id (optional, number) - ID stojanu, pro který nás zajímají události. Pokud není zadán, není na stojany aplikováno žádné omezení.
+
++ Response 200 (application/json)
+
+        {
+            "45": {
+                "id": 45,
+                "type": "CREATED",
+                "stationId": 51,
+                "date": "2017-09-27T10:21:10.998+02:00",
+                "userId": 225
+            },
+            "37": {
+                "id": 37,
+                "type": "UPDATED",
+                "stationId": 50,
+                "date": "2017-09-27T10:15:17.364+02:00",
+                "userId": 232
+            },
+            "36": {
+                "id": 36,
+                "type": "CREATED",
+                "stationId": 50,
+                "date": "2017-09-27T11:14:22.114+02:00",
+                "userId": 648
+            }
+        }
+
+
+# Group Station filters
+
+Uložená filtrovací kritéria stojanů.
+
+## Station filter collection [/station-filters]
+
+### List all filters [GET]
+
++ Response 200 (application/json)
+
+        {
+            "29": {
+                "id": 29,
+                "name": "Zápůjční elektro",
+                "battery": 100,
+                "batteryComparisonOperator": "LESS_THAN_EQUALS",
+                "status": 1,
+                "locks": [
+                    {
+                      "types": [
+                        "ZE"
+                      ],
+                      "charging": true
+                    },
+                    {
+                      "types": [
+                        "ZE"
+                      ],
+                      "charging": true
+                    }
+                ],
+                "partnerId": null,
+                "bikeOwnerId": null,
+                "externalId": "J541848",
+                "address": "grohova"
+            },
+            "35": {
+                "id": 35,
+                "name": "Soukromý klasik",
+                "battery": 100,
+                "batteryComparisonOperator": "LESS_THAN_EQUALS",
+                "status": 1,
+                "locks": [
+                    {
+                      "types": [
+                        "S"
+                      ],
+                      "charging": false
+                    },
+                    {
+                      "types": [
+                        "S"
+                      ],
+                      "charging": false
+                    }
+                ],
+                "partnerId": 9,
+                "bikeOwnerId": 10,
+                "externalId": null,
+                "address": null
+            },
+            "84": {
+                "id": 84,
+                "name": "Téměř vybitý",
+                "battery": 20,
+                "batteryComparisonOperator": "LESS_THAN_EQUALS",
+                "status": null,
+                "locks": [
+                    {
+                      "types": [
+                        "ZK"
+                      ],
+                      "charging": false
+                    },
+                    {
+                      "types": [
+                        "ZK"
+                      ],
+                      "charging": false
+                    }
+                ],
+                "partnerId": null,
+                "bikeOwnerId": null,
+                "externalId": null,
+                "address": null
+            }
+        }
+
+### List all filter IDs [GET /station-filters/ids]
++ Response 200 (application/json)
+
+        {
+            "allIds": [29, 35, 84]
+        }
+
+### Create new filter [POST]
++ Request (application/json)
+
+        {
+            "name": "Kriticky vybitý",
+            "battery": 10,
+            "batteryComparisonOperator": "LESS_THAN_EQUALS",
+            "status": null,
+            "locks": [
+                {
+                  "types": [
+                    "ZK"
+                  ],
+                  "charging": true
+                },
+                {
+                  "types": [
+                    "ZK"
+                  ],
+                  "charging": true
+                }
+            ],
+            "partnerId": 10,
+            "bikeOwnerId": null,
+            "externalId": null,
+            "address": null
+        }
+        
++ Response 201 (application/json)
+
+        {
+            "id": 92,
+            "name": "Kriticky vybitý",
+            "battery": 10,
+            "batteryComparisonOperator": "LESS_THAN_EQUALS",
+            "status": null,
+            "locks": [
+                {
+                  "types": [
+                    "ZK"
+                  ],
+                  "charging": true
+                },
+                {
+                  "types": [
+                    "ZK"
+                  ],
+                  "charging": true
+                }
+            ],
+            "partnerId": 10,
+            "bikeOwnerId": null,
+            "externalId": null,
+            "address": null
+        }
+
+## Station filter [/station-filters/{id}]
++ Parameters
+    + id: 35 (number) - id filtru
+
+### Retrieve filter [GET]
++ Response 200 (application/json)
+
+        {
+            "id": 35,
+            "name": "Soukromý klasik",
+            "battery": 100,
+            "batteryComparisonOperator": "LESS_THAN_EQUALS",
+            "status": 1,
+            "locks": [
+                {
+                  "types": [
+                    "S"
+                  ],
+                  "charging": false
+                },
+                {
+                  "types": [
+                    "S"
+                  ],
+                  "charging": false
+                }
+            ],
+            "partnerId": 9,
+            "bikeOwnerId": 10,
+            "externalId": null,
+            "address": null
+        }
+        
+### Update filter [PUT]
++ Request (application/json)
+
+        {
+            "id": 35,
+            "name": "Soukromý klasik",
+            "battery": 100,
+            "batteryComparisonOperator": "LESS_THAN",
+            "status": 1,
+            "locks": [
+                {
+                  "types": [
+                    "ZE"
+                  ],
+                  "charging": true
+                },
+                {
+                  "types": [
+                    "S"
+                  ],
+                  "charging": false
+                }
+            ],
+            "partnerId": 9,
+            "bikeOwnerId": null,
+            "externalId": null,
+            "address": "budějovice"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": 35,
+            "name": "Soukromý klasik",
+            "battery": 100,
+            "batteryComparisonOperator": "LESS_THAN",
+            "status": 1,
+            "locks": [
+                {
+                  "types": [
+                    "ZE"
+                  ],
+                  "charging": true
+                },
+                {
+                  "types": [
+                    "S"
+                  ],
+                  "charging": false
+                }
+            ],
+            "partnerId": 9,
+            "bikeOwnerId": null,
+            "externalId": null,
+            "address": "budějovice"
+        }
+        
+### Delete filter [DELETE]
++ Response 204
+
+
+# Group Station remote events
+
+Události vzniklé na fyzických stojanech.
+
+## Heartbeat events collection [/station/heartbeat-events]
+
+### List all heartbeat events  [GET /station/heartbeat-events{?station_id}]
++ Parameters
+    + station_id (optional, number) - ID stojanu, pro který nás zajímají události. Pokud není zadán, vrací události všech stojanů
+
++ Response 200 (application/json)
+
+        {
+            "15": {
+                "id": 15,
+                "stationId": 50,
+                "date": "2017-09-27T11:12:25.284+02:00",
+                "battery": 75,
+                "temperature": 32
+            },
+            "18": {
+                "id": 18,
+                "stationId": 50,
+                "date": "2017-09-27T10:15:17.364+02:00",
+                "battery": 72,
+                "temperature": 38
+            }
+        }
+
+### Create new heartbeat event [POST]
+
+Určeno pro vzdálené volání stojanem.
+
++ Request (application/json)
+
+        {
+            "stationId": 50,
+            "date": "2017-09-27T10:15:17+02:00",
+            "battery": 71,
+            "temperature": 38
+        }
+
++ Response 204
+
+
+# Group Station templates
+
+Šablony stojanů sloužící jako specifikace pro výrobu.
+
+## Station template collection [/station-templates]
+
+### List all templates [GET]
++ Response 200 (application/json)
+
+        {
+            "30": {
+                "id": 30,
+                "name": "Zápůjční elektro",
+                "locks": [
+                    {
+                        "id": 40,
+                        "charging": true,
+                        "types": ["ZE", "ZK"]
+                    },
+                    {
+                        "id": 41,
+                        "charging": true,
+                        "types": ["ZE", "ZK"]
+                    }
+                ]
+            },
+            "32": {
+                "id": 32,
+                "name": "Soukromý klasik",
+                "locks": [
+                    {
+                        "types": ["S"],
+                        "charging": false
+                    },
+                    {
+                        "types": ["S"],
+                        "charging": false
+                    }
+                ]
+            }
+        }
+
+### List all station template IDs [GET /station-templates/ids]
++ Response 200 (application/json)
+
+        {
+            "allIds": [30, 32]
+        }
+
+### Create new template [POST]
++ Request (application/json)
+
+        {
+            "name": "Zápůjční klasik",
+            "locks": [
+                {
+                    "types": ["ZK"],
+                    "charging": true
+                },
+                {
+                    "types": ["ZK"],
+                    "charging": true
+                }
+            ],
+            "createFilter": true
+        }
+
++ Response 201 (application/json)
+
+        {
+            "id": 38,
+            "name": "Zápůjční klasik",
+            "locks": [
+                {
+                    "types": ["ZK"],
+                    "charging": true
+                },
+                {
+                    "types": ["ZK"],
+                    "charging": true
+                }
+            ],
+            "createFilter": true
+        }
+
+## Station template [/station-templates/{id}]
++ Parameters
+    + id: 32 (number) - id šablony
+
+### Retrieve template [GET]
++ Response 200 (application/json)
+
+        {
+            "id": 32,
+            "name": "Soukromý klasik",
+            "locks": [
+                {
+                    "types": ["S"],
+                    "charging": false
+                },
+                {
+                    "types": ["S"],
+                    "charging": false
+                }
+            ]
+        }
+        
+### Update template [PUT]
++ Request (application/json)
+
+        {
+            "id": 32,
+            "name": "Soukromý elektro",
+            "locks": [
+                {
+                    "types": ["S"],
+                    "charging": true
+                },
+                {
+                    "types": ["S"],
+                    "charging": true
+                }
+            ]
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": 32,
+            "name": "Soukromý elektro",
+            "locks": [
+                {
+                    "types": ["S"],
+                    "charging": true
+                },
+                {
+                    "types": ["S"],
+                    "charging": true
+                }
+            ]
+        }
+
+### Delete template [DELETE]
++ Response 204
+
+### Create stations [POST /station-templates/{id}/create-stations]
+
+Hromadně vytvoří daný počet stojanů podle této šablony
+
++ Request (application/json)
+
+        {
+            "partnerId": 9,
+            "bikeOwnerId": 10,
+            "quantity": 12
+        }
+
++ Response 204
+
+
+# Group Stations
+
+Stojany.
+
+## Station collection [/stations]
+
+### List all stations [GET]
++ Response 200 (application/json)
+
+        {
+            "50": {
+                "id": 50,
+                "externalId": "J5487742",
+                "battery": 0,
+                "position": {
+                    "lat": null,
+                    "lng": null
+                },
+                "status": 0,
+                "partnerId": 10,
+                "bikeOwnerId": 10,
+                "address": null,
+                "locks": [
+                    {
+                        "id": 60,
+                        "station": 50,
+                        "type": [
+                            "ZK",
+                            "ZE"
+                        ],
+                        "charging": true,
+                        "lockedBy": null
+                    },
+                    {
+                        "id": 61,
+                        "station": 50,
+                        "type": [
+                            "ZK",
+                            "ZE"
+                        ],
+                        "charging": true,
+                        "lockedBy": 143
+                    }
+                ]
+            },
+            "51": {
+                "id": 51,
+                "externalId": "J5487725",
+                "battery": 90,
+                "position": {
+                    "lat": "49.200674",
+                    "lng": "16.593587"
+                },
+                "status": 1,
+                "partnerId": 9,
+                "bikeOwnerId": 10,
+                "address": "Grohova 38, Brno",
+                "locks": [
+                    {
+                        "id": 62,
+                        "station": 51,
+                        "type": [
+                            "S"
+                        ],
+                        "charging": false,
+                        "lockedBy": 204
+                    },
+                    {
+                        "id": 63,
+                        "station": 51,
+                        "type": [
+                            "S"
+                        ],
+                        "charging": false,
+                        "lockedBy": null
+                    }
+                ]
+            }
+        }
+
+### List all station IDs [GET /stations/ids]
++ Response 200 (application/json)
+
+        {
+            "allIds": [50, 51]
+        }
+
+### Create new station [POST]
+Vytvoří nový stojan, avšak pro vytváření stojanů se primárně používají šablony (/station-templates/{id}/create-stations).
+
++ Request (application/json)
+
+        {
+            "externalId": "J541812",
+            "position": {
+                "lat": null,
+                "lng": null
+            },
+            "status": 0,
+            "partnerId": 10,
+            "bikeOwnerId": 10,
+            "address": null,
+            "locks": [
+                {
+                    "type": [
+                        "ZK",
+                        "ZE"
+                    ],
+                    "charging": true
+                },
+                {
+                    "type": [
+                        "ZK",
+                        "ZE"
+                    ],
+                    "charging": true
+                }
+            ]
+        }
+
++ Response 204
+
+### Filter stations [POST /stations/search]
+
+Vrací stojany odpovídající zadaným kritériím.
+
++ Request (application/json)
+    + Attributes (object)
+        + battery: 80 (number)
+        + batteryComparisonOperator: `LESS_THAN_EQUALS` (enum[string]) - operátor porovnání hodnoty baterie
+            + `EQUALS`
+            + `LESS_THAN`
+            + `LESS_THAN_EQUALS`
+            + `GREATER_THAN`
+            + `GREATER_THAN_EQUALS`
+            + `NOT_EQUALS`
+        + status: 0 (number) - TODO: předělat na enum
+        + locks (array) - Seznam zámků, které musí stojan obsahovat, aby filtrem prošly. Musí se přesně shodovat počet, pořadí i vlastnosti.
+            + (object)
+                + types (array)
+                    + (enum[string])
+                        + `S`
+                        + `ZK`
+                        + `ZE`
+                + charging: true (boolean)
+        + partnerId: 9 (number) - ID partnera
+        + bikeOwnerId: 10 (number) - ID zapůjčitele
+        + externalId: J541848 (string) - case insensitive externí ID stojanu (celé, nikoli jen substring)
+        + address: grohova (string) - adresa nebo její část case insensitive
+        
++ Response 200 (application/json)
+
+        {
+            "51": {
+                "id": 51,
+                "externalId": "J541848",
+                "battery": 0,
+                "position": {
+                    "lat": "49.200674",
+                    "lng": "16.593587"
+                },
+                "status": 1,
+                "partnerId": 9,
+                "bikeOwnerId": null,
+                "address": "Grohova 38, Brno",
+                "locks": [
+                    {
+                        "id": 62,
+                        "type": [
+                            "S"
+                        ],
+                        "charging": false,
+                        "lockedBy": 204
+                    },
+                    {
+                        "id": 63,
+                        "type": [
+                            "S"
+                        ],
+                        "charging": false,
+                        "lockedBy": null
+                    }
+                ]
+            }
+        }
+
+## Station [/stations/{id}]
++ Parameters
+    + id: 51 (number) - ID stojanu
+
+### Retrieve station [GET]
++ Response 200 (application/json)
+
+        {
+            "id": 51,
+            "externalId": "J541848",
+            "battery": 0,
+            "position": {
+                "lat": "49.200674",
+                "lng": "16.593587"
+            },
+            "status": 1,
+            "partnerId": 9,
+            "bikeOwnerId": 10,
+            "address": "Grohova 38, Brno",
+            "locks": [
+                {
+                    "id": 62,
+                    "type": [
+                        "S"
+                    ],
+                    "charging": false,
+                    "lockedBy": 204
+                },
+                {
+                    "id": 63,
+                    "type": [
+                        "S"
+                    ],
+                    "charging": false,
+                    "lockedBy": null
+                }
+            ]
+        }
+
+### Update station [PUT]
++ Request (application/json)
+
+        {
+            "id": 51,
+            "externalId": "J541848",
+            "position": {
+                "lat": "49.200674",
+                "lng": "16.593587"
+            },
+            "status": 1,
+            "partnerId": 10,
+            "bikeOwnerId": null,
+            "address": "Grohova 36, Brno",
+            "locks": [
+                {
+                    "id": 62,
+                    "type": [
+                        "ZK",
+                        "ZE"
+                    ],
+                    "charging": false
+                },
+                {
+                    "id": 63,
+                    "type": [
+                        "ZK",
+                        "ZE"
+                    ],
+                    "charging": false
+                }
+            ]
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": 51,
+            "externalId": "J541848",
+            "battery": 0,
+            "position": {
+                "lat": "49.200674",
+                "lng": "16.593587"
+            },
+            "status": 1,
+            "partnerId": 10,
+            "bikeOwnerId": null,
+            "address": "Grohova 36, Brno",
+            "locks": [
+                {
+                    "id": 62,
+                    "type": [
+                        "ZK",
+                        "ZE"
+                    ],
+                    "charging": false,
+                    "lockedBy": 215
+                },
+                {
+                    "id": 63,
+                    "type": [
+                        "ZK",
+                        "ZE"
+                    ],
+                    "charging": false,
+                    "lockedBy": null
+                }
+            ]
+        }
+
+### Delete station [DELETE]
++ Response 204
+
+# Group Users
+
+Uživatelské účty.
+
+## User collection [/users]
+
+### Login [POST /oauth/token]
+
++ Request (multipart/form-data; boundary=----WebKitFormBoundary)
+
+        ------WebKitFormBoundary
+        Content-Disposition: form-data; name="grant_type"
+        
+        password
+        ------WebKitFormBoundary
+        Content-Disposition: form-data; name="scope"
+        
+        trust
+        ------WebKitFormBoundary
+        Content-Disposition: form-data; name="username"
+        
+        admin@sbs.keylog.cz
+        ------WebKitFormBoundary
+        Content-Disposition: form-data; name="password"
+        
+        123456
+        ------WebKitFormBoundary--
+    
++ Response 200 (application/json)
+
+        {
+            "access_token": "8e735586-04b7-46df-ab7a-d89918d99bcb",
+            "token_type": "bearer",
+            "refresh_token": "7483d27f-dddd-49b8-a396-302ec722e8c0",
+            "expires_in": 43199,
+            "scope": "trust"
+        }
